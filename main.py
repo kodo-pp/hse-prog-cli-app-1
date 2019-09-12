@@ -2,11 +2,12 @@
 
 import os
 import sys
+import time
 from argparse import ArgumentParser
 
 
 def parse_args():
-    ap = ArgumentParser(description='CLI Application (workshop 2)')
+    ap = ArgumentParser(description = 'CLI Application (workshop 2)')
     action_group = ap.add_mutually_exclusive_group(required=True)
     action_group.add_argument(
         '--mtime',
@@ -29,6 +30,12 @@ def parse_args():
         help = 'Rename file to B',
     )
 
+    ap.add_argument(
+        '--time-format',
+        '-t',
+        help='Date format. See https://docs.python.org/3/library/time.html#time.strftime for documentation',
+        default='%Y-%m-%d %H:%M:%S'
+    )
     ap.add_argument('filename', help='The name of the file')
     return ap.parse_args()
 
@@ -49,8 +56,9 @@ def get_size_in_mib(filename):
 
 def action_mtime(options):
     filename = options.filename
-    mtime = get_mtime(filename)
-    print(mtime)
+    raw_mtime = get_mtime(filename)
+    mtime = time.localtime(raw_mtime)
+    print(time.strftime(options.time_format, mtime))
 
 
 def action_size(options):
@@ -83,6 +91,7 @@ def main_wrapper():
     except Exception as e:
         print('Error: ' + str(e), file=sys.stderr)
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main_wrapper()
